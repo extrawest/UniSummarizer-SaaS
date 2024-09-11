@@ -4,6 +4,7 @@ import { loadSummarizationChain } from 'langchain/chains';
 import { YoutubeTranscript } from 'youtube-transcript';
 import { CheerioWebBaseLoader } from '@langchain/community/document_loaders/web/cheerio';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
 
 // https://lilianweng.github.io/posts/2023-06-23-agent/
 // https://www.youtube.com/watch?v=Tn6-PIqc4UM&t
@@ -53,12 +54,29 @@ export async function POST(req: Request) {
       input_documents: splittedDocs.length > 30 ? splittedDocs.slice(0, 29) : splittedDocs,
     });
 
+    const prompt = ChatPromptTemplate.fromMessages([
+      [
+        'system',
+        'You are a helpful assistant. You have to create a short title for provided text.',
+      ],
+      ['human', '{input}'],
+    ]);
+
+    const titleChain = prompt.pipe(model);
+    const response = await titleChain.invoke({
+      input: res?.text ?? '',
+    });
+
     return NextResponse.json(
       {
-        result: res,
+        result: res?.text ?? '',
         chunksSize: splittedDocs.length,
+        title: response.content.toString().trim().replaceAll('"', ''),
+        success: true,
       },
-      { status: 200 }
+      {
+        status: 200,
+      }
     );
   } catch (e) {
     console.error(e);

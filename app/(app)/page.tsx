@@ -3,14 +3,39 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChangeEvent, FC, useState } from 'react';
+import axios from 'axios';
 
 const MainPage: FC = () => {
   const [key, setKey] = useState('');
   const [url, setUrl] = useState('');
   const [summary, setSummary] = useState('');
+  const [title, setTitle] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const onSummarize = () => {
-    setSummary('Summary');
+  const onSummarize = async () => {
+    setSummary('');
+    setTitle('');
+    setError('');
+    try {
+      setLoading(true);
+      const res = await axios.post<{
+        result?: string;
+        title?: string;
+        success: boolean;
+        error?: unknown;
+      }>('/api/summary', {
+        url,
+        key,
+      });
+      setSummary(res?.data?.result ?? '');
+      setTitle(res?.data?.title ?? '');
+    } catch (e) {
+      console.error(e);
+      setError(JSON.stringify(e, null, 2));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onKeyChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -48,13 +73,19 @@ const MainPage: FC = () => {
         <Button
           type="button"
           variant="destructive"
-          disabled={!url || !key}
+          disabled={!url || !key || loading}
           onClick={onSummarize}
           className="mb-10"
         >
-          Summarize
+          {loading ? 'Analizing...' : 'Summarize'}
         </Button>
-        {summary && <div className="w-full bg-green-100 p-4 rounded-md">{summary}</div>}
+        {summary && (
+          <div className="w-full bg-green-100 p-4 rounded-md">
+            <h3 className="mb-2 font-semibold">{title}</h3>
+            <p>{summary}</p>
+          </div>
+        )}
+        {error && <div className="bg-red-100 p-4 rounded-md w-full">{error}</div>}
       </div>
     </div>
   );
