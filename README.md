@@ -2,6 +2,9 @@
 
 This app is designed to create summaries from various online sources. It accepts either YouTube video links or web article URLs as input and generates a comprehensive summary of the content.
 
+## Demo
+[video.webm](https://github.com/user-attachments/assets/54424fa7-1b8b-4077-9335-7abdc4f288a9)
+
 ## Technologies
 
 - NextJs
