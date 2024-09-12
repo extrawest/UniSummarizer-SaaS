@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ChangeEvent, FC, useState } from 'react';
 import axios from 'axios';
+import PasswordInput from '@/components/PasswordInput';
 
 const MainPage: FC = () => {
   const [key, setKey] = useState('');
@@ -51,10 +52,9 @@ const MainPage: FC = () => {
       <div className="px-10 py-20 flex-col w-1/4 bg-gray-200 h-full min-h-screen">
         <label>
           <p className="font-medium text-sm mb-2">Groq API key</p>
-          <Input
+          <PasswordInput
             value={key}
             onChange={onKeyChange}
-            type="password"
             placeholder="Enter key"
           />
         </label>

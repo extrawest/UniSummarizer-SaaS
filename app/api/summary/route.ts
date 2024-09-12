@@ -10,7 +10,8 @@ import { ChatPromptTemplate } from '@langchain/core/prompts';
 // https://www.youtube.com/watch?v=Tn6-PIqc4UM&t
 
 const QUOTE_CODE = '&amp;#39;';
-const youtubeBaseUrl = 'youtube.com';
+const yuotubeRegex =
+  /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 
 export async function POST(req: Request) {
   const { url, key } = await req.json();
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
   let allData = '';
 
   try {
-    if (url.includes(youtubeBaseUrl)) {
+    if (url.match(yuotubeRegex)) {
       const transcript = await YoutubeTranscript.fetchTranscript(url);
 
       allData = transcript
